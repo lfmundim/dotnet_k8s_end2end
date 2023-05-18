@@ -1,13 +1,25 @@
+# this tells the Pipeline to trigger on main branch pushes
 trigger:
 - main
 
+# this tells it to use an Ubuntu image to run the steps.
 pool:
   vmImage: ubuntu-latest
 
 steps:
+# this tells the Pipeline to build ALL .csproj files
+# it can be ommited on the nobuild part of next step, 
+# but I prefer it separate so it fails separately
 - task: DotNetCoreCLI@2
   inputs:
     command: 'build'
     projects: '**/*.csproj'
 
-
+# this tells the Pipeline to pack ALL the .csproj files
+# into an artifact that can be used later 
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'pack'
+    packagesToPack: '**/*.csproj'
+    nobuild: true
+    versioningScheme: 'byBuildNumber'
