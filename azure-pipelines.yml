@@ -8,21 +8,19 @@ pool:
 
 steps:
 # this tells the Pipeline to build ALL .csproj files
-# it can be ommited on the nobuild part of next step, 
-# but I prefer it separate so it fails separately
+# it can look redundant from docker building, but this
+# is a tad bit faster than Docker Build, so it takes less
+# time to fail, if it does
 - task: DotNetCoreCLI@2
   inputs:
     command: 'build'
     projects: '**/*.csproj'
 
-# this tells the Pipeline to pack ALL the .csproj files
-# into an artifact that can be used later 
-- task: DotNetCoreCLI@2
+# this tells the Pipeline to build the docker image 
+# and push it to the repository
+- task: Docker@2
   inputs:
-    command: 'pack'
-    packagesToPack: '**/*.csproj'
-    nobuild: true
-    versioningScheme: 'byPrereleaseNumber'
-    majorVersion: '1'
-    minorVersion: '0'
-    patchVersion: '0'
+    containerRegistry: 'DockerHub'
+    repository: 'dotnet_k8s_end2end'
+    command: 'buildAndPush'
+    Dockerfile: '**/Dockerfile'
